@@ -1,3 +1,11 @@
-*.out
+﻿*.out
 *.vcd
 *.vvp
+
+verilog_1_7/
+verilog_8/
+verilog_9_11/
+verilog_12_13/
+verilog_14_16/
+verilog_18/
+.vscode/
