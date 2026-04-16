@@ -15,7 +15,7 @@ always #5 clk = ~clk;
 
 initial begin
     $dumpfile("tb_reg8.vcd");
-    $dumpvars(0, reg8_tb);
+    $dumpvars(0, tb_reg8);
 
     $monitor("t = %0t, rst_n = %b, en = %b, d = %b, q = %b",
             $time, rst_n, en, d, q);

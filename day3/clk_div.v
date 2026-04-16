@@ -1,4 +1,4 @@
-module clk_div(
+﻿module clk_div(
     input clk_in,  // 50 Mhz
     input rst_n,
     output reg clk_out  // 1 Mhz
