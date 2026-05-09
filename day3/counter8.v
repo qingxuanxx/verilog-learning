@@ -15,7 +15,7 @@ begin
     else if (load)
         cnt <= din;
     else if (en)
-        cnt = cnt + 1'b1;
+        cnt <= cnt + 1'b1;
 end
 
 endmodule

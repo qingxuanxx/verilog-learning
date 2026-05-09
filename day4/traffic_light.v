@@ -24,15 +24,15 @@ always @(posedge clk or negedge rst_n)
 begin
     if (!rst_n)
     begin
-        current_state <= red;
+        current_state <= s_red;
         cnt <= 26'b0;
     end
     else
     begin
         current_state <= next_state;
         // 计数器：到时间清零，否则自增
-        if ((current_state == s_red && cnt == time_10s - 1) |
-        (current_state == s_green && cnt == time_10s - 1) |
+        if ((current_state == s_red && cnt == time_10s - 1) ||
+        (current_state == s_green && cnt == time_10s - 1) ||
         (current_state == s_yellow && cnt == time_3s - 1))
         begin
             cnt <= 26'b0;
