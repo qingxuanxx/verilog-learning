@@ -46,7 +46,6 @@ gtkwave adder4.vcd
 
 ## 参考资料
 
-- 《Verilog HDL 高级数字设计》（Michael D. Ciletti）
-- HDLBits (https://hdlbits.01xz.net/)
+- 《Verilog 数字系统设计教程》（第3版，夏宇闻）
 
 > 最后更新：2026-08-11
