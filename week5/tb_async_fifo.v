@@ -15,7 +15,7 @@ wire [width-1:0] rd_data;
 wire full;
 wire empty;
 
-// ÊµÀı»¯
+// å®ä¾‹åŒ–
 async_fifo #(
     .width(width), 
     .depth(depth)
@@ -34,12 +34,12 @@ async_fifo #(
 
 initial begin
     wr_clk = 1'b0;
-    forever #5 wr_clk = ~wr_clk;  // Ğ´Ê±ÖÓÖÜÆÚ10ns
+    forever #5 wr_clk = ~wr_clk;  // å†™æ—¶é’Ÿå‘¨æœŸ10ns
 end
 
 initial begin
     rd_clk = 1'b0;
-    forever #10 rd_clk = ~rd_clk;  // ¶ÁÊ±ÖÓÖÜÆÚ20ns£¬²»Í¬ÓÚĞ´Ê±ÖÓ
+    forever #10 rd_clk = ~rd_clk;  // è¯»æ—¶é’Ÿå‘¨æœŸ20nsï¼Œä¸åŒäºå†™æ—¶é’Ÿ
 end
 
 initial begin
@@ -54,7 +54,7 @@ end
 
 integer i;
 initial begin
-    // ³õÊ¼»¯
+    // åˆå§‹åŒ–
     wr_rst_n = 1'b0;
     rd_rst_n = 1'b0;
     wr_en = 1'b0;
@@ -66,13 +66,13 @@ initial begin
     rd_rst_n = 1'b1;
     #10;
 
-    // ³¡¾°1£ºÁ¬ĞøĞ´Èë16¸öÊı¾İ£¬²âÊÔÂú×´Ì¬
-    $display("=== ³¡¾°1: Á¬ĞøĞ´Èë16¸öÊı¾İ ===");
+    // åœºæ™¯1ï¼šè¿ç»­å†™å…¥16ä¸ªæ•°æ®ï¼Œæµ‹è¯•æ»¡çŠ¶æ€
+    $display("=== åœºæ™¯1: è¿ç»­å†™å…¥16ä¸ªæ•°æ® ===");
     for (i = 0; i < depth; i = i + 1)
     begin
         @(posedge wr_clk);
         wr_en = 1'b1;
-        wr_data = wr_data + 1'b1;  // Ã¿´ÎĞ´ÈëµİÔöµÄÊı¾İ
+        wr_data = wr_data + 1'b1;  // æ¯æ¬¡å†™å…¥é€’å¢çš„æ•°æ®
     end
     @(posedge wr_clk);
     wr_en = 1'b0;
@@ -80,11 +80,11 @@ initial begin
 
     if (full)
     begin
-        $display("fifoÎªÂú×´Ì¬");
+        $display("fifoä¸ºæ»¡çŠ¶æ€");
     end
 
-    // ³¡¾°2£ºÁ¬Ğø¶ÁÈ¡16¸öÊı¾İ£¬²âÊÔ¿Õ×´Ì¬
-    $display("=== ³¡¾°2: Á¬Ğø¶ÁÈ¡16¸öÊı¾İ ===");
+    // åœºæ™¯2ï¼šè¿ç»­è¯»å–16ä¸ªæ•°æ®ï¼Œæµ‹è¯•ç©ºçŠ¶æ€
+    $display("=== åœºæ™¯2: è¿ç»­è¯»å–16ä¸ªæ•°æ® ===");
     for (i = 0; i < depth; i = i + 1)
     begin
         @(posedge rd_clk);
@@ -96,12 +96,12 @@ initial begin
 
     if (empty)
     begin
-        $display("fifoÎª¿Õ×´Ì¬");
+        $display("fifoä¸ºç©ºçŠ¶æ€");
     end
 
-    // ³¡¾°3£ºÍ¬Ê±¶ÁĞ´ Ğ´¿ì¶ÁÂı
-    $display("=== ³¡¾°3: Í¬Ê±¶ÁĞ´£¬Ğ´¿ì¶ÁÂı ===");
-    // Ğ´Èë16¸öÊı¾İ
+    // åœºæ™¯3ï¼šåŒæ—¶è¯»å†™ å†™å¿«è¯»æ…¢
+    $display("=== åœºæ™¯3: åŒæ—¶è¯»å†™ï¼Œå†™å¿«è¯»æ…¢ ===");
+    // å†™å…¥16ä¸ªæ•°æ®
     for (i = 0; i < depth; i = i + 1)
     begin
         @(posedge wr_clk);
@@ -111,7 +111,7 @@ initial begin
     @(posedge wr_clk);
     wr_en = 1'b0;
 
-    // ¶Á³ö16¸öÊı¾İ
+    // è¯»å‡º16ä¸ªæ•°æ®
     for (i = 0; i < depth; i = i + 1)
     begin
         @(posedge rd_clk);
@@ -122,9 +122,9 @@ initial begin
 
     #20;
 
-    // ³¡¾°4£ºÂúĞ´²âÊÔ
-    $display("=== ³¡¾°4: ÂúĞ´²âÊÔ ===");
-    // Ğ´Èë16¸öÊı¾İÊ¹fifoÂú
+    // åœºæ™¯4ï¼šæ»¡å†™æµ‹è¯•
+    $display("=== åœºæ™¯4: æ»¡å†™æµ‹è¯• ===");
+    // å†™å…¥16ä¸ªæ•°æ®ä½¿fifoæ»¡
     for (i = 0; i < depth; i = i + 1)
     begin
         @(posedge wr_clk);
@@ -135,7 +135,7 @@ initial begin
     wr_en = 1'b0;
     #20;
 
-    // ³¢ÊÔĞ´ÈëÊı¾İ£¬Ğ´²Ù×÷ÎŞĞ§
+    // å°è¯•å†™å…¥æ•°æ®ï¼Œå†™æ“ä½œæ— æ•ˆ
     @(posedge wr_clk);
     wr_en = 1'b1;
     wr_data = wr_data + 1'b1;
@@ -143,9 +143,9 @@ initial begin
     wr_en = 1'b0;
     #20;
 
-    // ³¡¾°5£º¿Õ¶Á²âÊÔ
-    $display("=== ³¡¾°5: ¿Õ¶Á²âÊÔ ===");
-    // ¶Á³ö16¸öÊı¾İÊ¹fifo¿Õ
+    // åœºæ™¯5ï¼šç©ºè¯»æµ‹è¯•
+    $display("=== åœºæ™¯5: ç©ºè¯»æµ‹è¯• ===");
+    // è¯»å‡º16ä¸ªæ•°æ®ä½¿fifoç©º
     for (i = 0; i < depth; i = i + 1)
     begin
         @(posedge rd_clk);
@@ -155,14 +155,14 @@ initial begin
     rd_en = 1'b0;
     #20;
 
-    // ³¢ÊÔ¶ÁÈ¡Êı¾İ£¬¶Á²Ù×÷ÎŞĞ§
+    // å°è¯•è¯»å–æ•°æ®ï¼Œè¯»æ“ä½œæ— æ•ˆ
     @(posedge rd_clk);
     rd_en = 1'b1;
     @(posedge rd_clk);
     rd_en = 1'b0;
     #20;
 
-    $display("=== ËùÓĞ²âÊÔÍê³É£¬·ÂÕæ½áÊø ===");
+    $display("=== æ‰€æœ‰æµ‹è¯•å®Œæˆï¼Œä»¿çœŸç»“æŸ ===");
     $finish;
 
 end

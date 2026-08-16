@@ -1,12 +1,12 @@
-// ÓÅÏÈ¼¶¹æÔò£ºreq[0] > req[1] > req[2]
+// ä¼˜å…ˆçº§è§„åˆ™ï¼šreq[0] > req[1] > req[2]
 module arbiter_3(
     input clk, 
     input rst_n, 
-    input [2:0] req,  // 3Â·ÇëÇó£¬req[0]ÓÅÏÈ¼¶×î¸ß
-    output reg [2:0] grant  // 3Â·ÊÚÈ¨£¬Í¬Ò»Ê±¿Ì×î¶à1bitÎª1
+    input [2:0] req,  // 3è·¯è¯·æ±‚ï¼Œreq[0]ä¼˜å…ˆçº§æœ€é«˜
+    output reg [2:0] grant  // 3è·¯æˆæƒï¼ŒåŒä¸€æ—¶åˆ»æœ€å¤š1bitä¸º1
 );
 
-// ÓÅÏÈ¼¶ÅĞ¶Ï
+// ä¼˜å…ˆçº§åˆ¤æ–­
 always @(posedge clk or negedge rst_n)
 begin
     if (!rst_n)

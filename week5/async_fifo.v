@@ -1,60 +1,60 @@
-// Òì²½ fifo Ä£¿é
-// ¿çÊ±ÖÓÓòÉè¼Æ + ¸ñÀ×ÂëÖ¸Õë
+// å¼‚æ­¥ fifo æ¨¡å—
+// è·¨æ—¶é’ŸåŸŸè®¾è®¡ + æ ¼é›·ç æŒ‡é’ˆ
 module async_fifo#(
     parameter width = 8,
     parameter depth = 16
 )(
     input wr_clk,
-    input wr_rst_n, // Ğ´Ê±ÖÓ¸´Î»
-    input wr_en,  // Ğ´Ê¹ÄÜ
+    input wr_rst_n, // å†™æ—¶é’Ÿå¤ä½
+    input wr_en,  // å†™ä½¿èƒ½
     input [width-1:0] wr_data,
     
     input rd_clk,
-    input rd_rst_n, // ¶ÁÊ±ÖÓ¸´Î»
-    input rd_en,  // ¶ÁÊ¹ÄÜ
+    input rd_rst_n, // è¯»æ—¶é’Ÿå¤ä½
+    input rd_en,  // è¯»ä½¿èƒ½
     output reg [width-1:0] rd_data,
 
-// output reg£ºÔÚ always Ê±ĞòÀïÃæ¸³Öµ£¬¼Ó reg
-// output£¨Ä¬ÈÏ wire£©£ºÓÃ assign Á¬Ğø¸³ÖµÓï¾ä¸³Öµ£¬²»¼Óreg
+// output regï¼šåœ¨ always æ—¶åºé‡Œé¢èµ‹å€¼ï¼ŒåŠ  reg
+// outputï¼ˆé»˜è®¤ wireï¼‰ï¼šç”¨ assign è¿ç»­èµ‹å€¼è¯­å¥èµ‹å€¼ï¼Œä¸åŠ reg
 
-    output full,  // Ğ´Ê±ÖÓÓòµÄÂúĞÅºÅ
-    output empty  // ¶ÁÊ±ÖÓÓòµÄ¿ÕĞÅºÅ
+    output full,  // å†™æ—¶é’ŸåŸŸçš„æ»¡ä¿¡å·
+    output empty  // è¯»æ—¶é’ŸåŸŸçš„ç©ºä¿¡å·
 );
 
 localparam addr_width = $clog2(depth);
-localparam ptr_width = addr_width + 1;  // Ö¸ÕëÎ»¿í=µØÖ·Î»¿í+1=5bit
+localparam ptr_width = addr_width + 1;  // æŒ‡é’ˆä½å®½=åœ°å€ä½å®½+1=5bit
 
-// Ğ´Ê±ÖÓÓò£º¶ş½øÖÆĞ´Ö¸Õë¡¢¸ñÀ×ÂëĞ´Ö¸Õë
-reg [ptr_width-1:0] wptr_bin;  // ¶ş½øÖÆĞ´Ö¸Õë
-reg [ptr_width-1:0] wptr_gray; // ¸ñÀ×ÂëĞ´Ö¸Õë
+// å†™æ—¶é’ŸåŸŸï¼šäºŒè¿›åˆ¶å†™æŒ‡é’ˆã€æ ¼é›·ç å†™æŒ‡é’ˆ
+reg [ptr_width-1:0] wptr_bin;  // äºŒè¿›åˆ¶å†™æŒ‡é’ˆ
+reg [ptr_width-1:0] wptr_gray; // æ ¼é›·ç å†™æŒ‡é’ˆ
 
-// ¶ÁÊ±ÖÓÓò£º¶ş½øÖÆ¶ÁÖ¸Õë¡¢¸ñÀ×Âë¶ÁÖ¸Õë
-reg [ptr_width-1:0] rptr_bin;  // ¶ş½øÖÆ¶ÁÖ¸Õë
-reg [ptr_width-1:0] rptr_gray; // ¸ñÀ×Âë¶ÁÖ¸Õë
+// è¯»æ—¶é’ŸåŸŸï¼šäºŒè¿›åˆ¶è¯»æŒ‡é’ˆã€æ ¼é›·ç è¯»æŒ‡é’ˆ
+reg [ptr_width-1:0] rptr_bin;  // äºŒè¿›åˆ¶è¯»æŒ‡é’ˆ
+reg [ptr_width-1:0] rptr_gray; // æ ¼é›·ç è¯»æŒ‡é’ˆ
 
-// ´æ´¢Ìå£¨Î»¿í8£¬Éî¶È16£©
+// å­˜å‚¨ä½“ï¼ˆä½å®½8ï¼Œæ·±åº¦16ï¼‰
 reg [width-1:0] mem [depth-1:0];
 
-// Í¬²½µçÂ·¼Ä´æÆ÷£ºĞ´Ö¸ÕëÍ¬²½µ½¶ÁÊ±ÖÓÓò£¨Á½¼¶£©
+// åŒæ­¥ç”µè·¯å¯„å­˜å™¨ï¼šå†™æŒ‡é’ˆåŒæ­¥åˆ°è¯»æ—¶é’ŸåŸŸï¼ˆä¸¤çº§ï¼‰
 reg [ptr_width-1:0] wptr_gray_sync1;
 reg [ptr_width-1:0] wptr_gray_sync2;
 
-// Í¬²½µçÂ·¼Ä´æÆ÷£º¶ÁÖ¸ÕëÍ¬²½µ½Ğ´Ê±ÖÓÓò£¨Á½¼¶£©
+// åŒæ­¥ç”µè·¯å¯„å­˜å™¨ï¼šè¯»æŒ‡é’ˆåŒæ­¥åˆ°å†™æ—¶é’ŸåŸŸï¼ˆä¸¤çº§ï¼‰
 reg [ptr_width-1:0] rptr_gray_sync1;
 reg [ptr_width-1:0] rptr_gray_sync2;
 
 integer i;
 
-// ¶ş½øÖÆ×ª¸ñÀ×Âë
+// äºŒè¿›åˆ¶è½¬æ ¼é›·ç 
 function [ptr_width-1:0] bin2gray;
     input [ptr_width-1:0] bin;
     begin
-        bin2gray = bin ^ (bin >> 1);  // ¶ş½øÖÆ×ª¸ñÀ×Âë¹«Ê½
+        bin2gray = bin ^ (bin >> 1);  // äºŒè¿›åˆ¶è½¬æ ¼é›·ç å…¬å¼
     end
 endfunction
 
-// 1.Ğ´Ê±ÖÓÓòÂß¼­£º¶ÁÖ¸ÕëÍ¬²½¡¢Ğ´Ö¸Õë¸üĞÂ¡¢´æ´¢ÌåĞ´²Ù×÷
-// 1.1 ¶ÁÖ¸ÕëÍ¬²½
+// 1.å†™æ—¶é’ŸåŸŸé€»è¾‘ï¼šè¯»æŒ‡é’ˆåŒæ­¥ã€å†™æŒ‡é’ˆæ›´æ–°ã€å­˜å‚¨ä½“å†™æ“ä½œ
+// 1.1 è¯»æŒ‡é’ˆåŒæ­¥
 always @(posedge wr_clk or negedge wr_rst_n)
 begin
     if (!wr_rst_n)
@@ -69,7 +69,7 @@ begin
     end
 end
 
-// 1.2 Ğ´Ö¸Õë¸üĞÂ
+// 1.2 å†™æŒ‡é’ˆæ›´æ–°
 always @(posedge wr_clk or negedge wr_rst_n)
 begin
     if (!wr_rst_n)
@@ -77,14 +77,14 @@ begin
         wptr_bin <= {ptr_width{1'b0}};
         wptr_gray <= {ptr_width{1'b0}};
     end
-    else if (wr_en && !full)  // Ğ´Ê¹ÄÜÇÒfifoÎ´Âú
+    else if (wr_en && !full)  // å†™ä½¿èƒ½ä¸”fifoæœªæ»¡
     begin
         wptr_bin <= wptr_bin + 1;
-        wptr_gray <= bin2gray(wptr_bin + 1);  // <= ¶ÁµÄÊÇ¾ÉÖµ£¬ËùÒÔÒª bin2gray(wptr_bin + 1)
+        wptr_gray <= bin2gray(wptr_bin + 1);  // <= è¯»çš„æ˜¯æ—§å€¼ï¼Œæ‰€ä»¥è¦ bin2gray(wptr_bin + 1)
     end
 end
 
-// 1.3 ´æ´¢ÌåĞ´²Ù×÷
+// 1.3 å­˜å‚¨ä½“å†™æ“ä½œ
 always @(posedge wr_clk or negedge wr_rst_n)
 begin
     if (!wr_rst_n)
@@ -94,14 +94,14 @@ begin
             mem[i] <= {width{1'b0}};
         end
     end
-    else if (wr_en && !full)  // Ğ´Ê¹ÄÜÇÒfifoÎ´Âú
+    else if (wr_en && !full)  // å†™ä½¿èƒ½ä¸”fifoæœªæ»¡
     begin
-        mem[wptr_bin[addr_width-1:0]] <= wr_data;  // Ö¸ÕëµÍ4Î»ÎªramµØÖ·
+        mem[wptr_bin[addr_width-1:0]] <= wr_data;  // æŒ‡é’ˆä½4ä½ä¸ºramåœ°å€
     end
 end
 
-// 2.¶ÁÊ±ÖÓÓòÂß¼­£ºĞ´Ö¸ÕëÍ¬²½¡¢¶ÁÖ¸Õë¸üĞÂ¡¢´æ´¢Ìå¶Á²Ù×÷
-// 2.1 Ğ´Ö¸ÕëÍ¬²½
+// 2.è¯»æ—¶é’ŸåŸŸé€»è¾‘ï¼šå†™æŒ‡é’ˆåŒæ­¥ã€è¯»æŒ‡é’ˆæ›´æ–°ã€å­˜å‚¨ä½“è¯»æ“ä½œ
+// 2.1 å†™æŒ‡é’ˆåŒæ­¥
 always @(posedge rd_clk or negedge rd_rst_n)
 begin
     if (!rd_rst_n)
@@ -116,7 +116,7 @@ begin
     end
 end
 
-// 2.2 ¶ÁÖ¸Õë¸üĞÂ
+// 2.2 è¯»æŒ‡é’ˆæ›´æ–°
 always @(posedge rd_clk or negedge rd_rst_n)
 begin
     if (!rd_rst_n)
@@ -124,31 +124,31 @@ begin
         rptr_bin <= {ptr_width{1'b0}};
         rptr_gray <= {ptr_width{1'b0}};
     end
-    else if (rd_en && !empty)  // ¶ÁÊ¹ÄÜÇÒfifo·Ç¿Õ
+    else if (rd_en && !empty)  // è¯»ä½¿èƒ½ä¸”fifoéç©º
     begin
         rptr_bin <= rptr_bin + 1'b1;
         rptr_gray <= bin2gray(rptr_bin + 1'b1);
     end
 end
 
-// 2.3 ´æ´¢Ìå¶Á²Ù×÷
+// 2.3 å­˜å‚¨ä½“è¯»æ“ä½œ
 always @(posedge rd_clk or negedge rd_rst_n)
 begin
     if (!rd_rst_n)
     begin
         rd_data <= {width{1'b0}};
     end
-    else if (rd_en && !empty)  // ¶ÁÊ¹ÄÜÇÒfifo·Ç¿Õ
+    else if (rd_en && !empty)  // è¯»ä½¿èƒ½ä¸”fifoéç©º
     begin
-        rd_data <= mem[rptr_bin[addr_width-1:0]];  // Ö¸ÕëµÍ4Î»ÎªramµØÖ·
+        rd_data <= mem[rptr_bin[addr_width-1:0]];  // æŒ‡é’ˆä½4ä½ä¸ºramåœ°å€
     end
 end
 
-// Âú¿ÕĞÅºÅÅĞ¶Ï
-// ¿ÕĞÅºÅÅĞ¶Ï(ÔÚ¶ÁÊ±ÖÓÓò)
+// æ»¡ç©ºä¿¡å·åˆ¤æ–­
+// ç©ºä¿¡å·åˆ¤æ–­(åœ¨è¯»æ—¶é’ŸåŸŸ)
 assign empty = (wptr_gray_sync2 == rptr_gray) ? 1'b1 : 1'b0;
 
-// ÂúĞÅºÅÅĞ¶Ï£¨ÔÚĞ´Ê±ÖÓÓò£©£º×î¸ßÎ»Ïà·´£¬´Î¸ßÎ»Ïà·´£¬ÆäËûÎ»ÏàÍ¬
+// æ»¡ä¿¡å·åˆ¤æ–­ï¼ˆåœ¨å†™æ—¶é’ŸåŸŸï¼‰ï¼šæœ€é«˜ä½ç›¸åï¼Œæ¬¡é«˜ä½ç›¸åï¼Œå…¶ä»–ä½ç›¸åŒ
 assign full = (wptr_gray[ptr_width-1] != rptr_gray_sync2[ptr_width-1]) && 
               (wptr_gray[ptr_width-2] != rptr_gray_sync2[ptr_width-2]) && 
               (wptr_gray[ptr_width-3:0] == rptr_gray_sync2[ptr_width-3:0]) ? 1'b1 : 1'b0;
